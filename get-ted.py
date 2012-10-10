@@ -90,7 +90,7 @@ class Ted(object):
 
         cmd = ['wget', self.url, '-O', download_file]
         cmd.extend(additional_args)
-        out('calling: %s' % ''.join(cmd))
+        out('calling: %s' % ' '.join(cmd))
         status = call_and_output(cmd)
 
         full_path_file = os.path.join(self.self.download_dir, self.filename)
@@ -216,5 +216,5 @@ if __name__ == '__main__':
     tedlst = TedList(options.localfile)
     out('Tedlst instantiated: %s'  % tedlst)
     tedlst.populate()
-    out('Tedlst populated: %s'  % tedlst)
+    #out('Tedlst populated: %s'  % tedlst)
     tedlst.download_one()
