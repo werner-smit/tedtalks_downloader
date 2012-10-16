@@ -24,12 +24,15 @@ def call_and_output(*args):
     """
     cmd = Popen(*args, stdout=PIPE)
     while 1:
-        cmdout, cmderr = cmd.communicate()
+        status = cmd.poll()
+        if status != None:
+            return status
+        try:
+            cmdout, cmderr = cmd.communicate()
+        except ValueError:
+            pass
         if cmdout:
             out(cmdout)
-        status = cmd.poll()
-        if status:
-            return status
         time.sleep(0.5) 
 
 class Config(object):
@@ -93,8 +96,8 @@ class Ted(object):
         out('calling: %s' % ' '.join(cmd))
         status = call_and_output(cmd)
 
-        full_path_file = os.path.join(self.self.download_dir, self.filename)
-        full_path_tmp = os.path.join(self.self.download_dir, self.filename_tmp)
+        full_path_file = os.path.join(self.download_dir, self.filename)
+        full_path_tmp = os.path.join(self.download_dir, self.filename_tmp)
         try:
             os.rename(full_path_tmp, full_path_file)
         except:
@@ -150,7 +153,8 @@ class TedList(object):
         self._ted_list[index].download(self.download_dir)
     
     def download_all(self):
-        pass
+        for ted in self._ted_list:
+            ted.download()
 
     def _get_current_ted_list(self):
         self._existing_ted_list = os.listdir(self.download_dir)
@@ -209,6 +213,10 @@ class TedList(object):
 
 
 if __name__ == '__main__':
+    """
+    TODO: add download one or download all option.
+    TODO: add destination dir
+    """
     parser = OptionParser()
     parser.add_option('-f', '--local-file', dest='localfile', default=False,
                     help='Use the local html file instead of downloading it.', metavar='FILE')
@@ -217,4 +225,4 @@ if __name__ == '__main__':
     out('Tedlst instantiated: %s'  % tedlst)
     tedlst.populate()
     #out('Tedlst populated: %s'  % tedlst)
-    tedlst.download_one()
+    tedlst.download_all()
